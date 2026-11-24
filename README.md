@@ -24,7 +24,7 @@ target recall. It is a non-commercial research prototype for indoor scenes, not 
 
 ![Glance-Stream-0.8B on a kitchen clip: four standing rules, their alerts and a box (real model outputs)](assets/demo.gif)
 
-<sub>**Rendered with the v0.1 weights (the earlier 600-step box adapter); a re-render with the released box weights is pending, so the box in the demo may differ from what the released model outputs.** Glance-Stream-0.8B watching a 36 s kitchen clip at 30 fps with four rules (real model outputs, rendered by
+<sub>Glance-Stream-0.8B watching a 36 s kitchen clip at 30 fps with four rules (real model outputs, rendered by
 [`examples/make_demo.py`](examples/make_demo.py); the raw readouts are in
 [`assets/demo_predictions.json`](assets/demo_predictions.json)). Bars show p(yes) with the 0.5 threshold, the strips
 show its history, red triangles are alerts. No hand-washing happens in the clip, so every cutting segment violates the

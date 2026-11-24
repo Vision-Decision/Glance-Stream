@@ -17,7 +17,7 @@ Glance-Stream 每 0.5 秒对所有规则同时给出一次判断。每条规则�
 
 ![Glance-Stream-0.8B 在一段厨房视频上：四条常驻规则、报警和框（真实模型输出）](assets/demo.gif)
 
-<sub>**演示用 v0.1 权重渲染（较早的 600 步框 adapter）；用发布版框权重的重渲染待完成，演示中的框可能与发布模型的输出不同。** Glance-Stream-0.8B 以 30 fps 观看一段 36 秒的厨房视频，同时挂四条规则。画面是真实模型输出，由 [`examples/make_demo.py`](examples/make_demo.py) 渲染，原始读出在 [`assets/demo_predictions.json`](assets/demo_predictions.json)。条形是 p(yes)，竖线是 0.5 阈值；右侧曲线是历史；红色三角是报警。片中没有洗手，所以每段切菜都违反最后一条规则。有一次报警是错的：11.5 秒刚放下刀时，"holding a knife" 仍然报警。素材：Anna Shvets / Pexels。另有 [MP4](assets/demo.mp4)。</sub>
+<sub>Glance-Stream-0.8B 以 30 fps 观看一段 36 秒的厨房视频，同时挂四条规则。画面是真实模型输出，由 [`examples/make_demo.py`](examples/make_demo.py) 渲染，原始读出在 [`assets/demo_predictions.json`](assets/demo_predictions.json)。条形是 p(yes)，竖线是 0.5 阈值；右侧曲线是历史；红色三角是报警。片中没有洗手，所以每段切菜都违反最后一条规则。有一次报警是错的：11.5 秒刚放下刀时，"holding a knife" 仍然报警。素材：Anna Shvets / Pexels。另有 [MP4](assets/demo.mp4)。</sub>
 
 ## 快速开始
 
