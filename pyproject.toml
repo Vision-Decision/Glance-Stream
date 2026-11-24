@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "glance-stream"
+version = "0.1.0"
+description = "Standing yes/no rules and boxes over a live video stream with one small video-language model (Qwen3.5-0.8B)"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+dependencies = [
+  "torch>=2.4",
+  "transformers>=5.23",
+  "safetensors",
+  "huggingface_hub",
+  "av",
+  "numpy",
+]
+
+[project.optional-dependencies]
+fla = ["flash-linear-attention"]
+demo = ["pillow>=10.1"]
+test = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/Vision-Decision/Glance-Stream"
+Weights = "https://huggingface.co/Vision-Decision/Glance-Stream-0.8B"
+
+[tool.setuptools.packages.find]
+include = ["glance_stream*"]

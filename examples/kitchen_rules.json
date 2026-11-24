@@ -1,0 +1,8 @@
+[
+ {"type": "now", "X": "someone is cutting vegetables", "name": "cutting vegetables"},
+ {"type": "now", "X": "someone is holding a knife", "box": "the woman holding a knife", "name": "holding a knife"},
+ {"type": "a_not_followed", "A": "someone opens the fridge", "B": "someone closes the fridge", "T": 30,
+  "name": "fridge closed within 30 s"},
+ {"type": "b_without_a", "A": "someone washes their hands", "B": "someone is cutting vegetables", "T": 60,
+  "name": "hands washed before cutting"}
+]
