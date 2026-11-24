@@ -24,7 +24,7 @@ target recall. It is a non-commercial research prototype for indoor scenes, not 
 
 ![Glance-Stream-0.8B on a kitchen clip: four standing rules, their alerts and a box (real model outputs)](assets/demo.gif)
 
-<sub>Glance-Stream-0.8B watching a 36 s kitchen clip at 30 fps with four rules (real model outputs, rendered by
+<sub>**Rendered with the v0.1 weights (the earlier 600-step box adapter); a re-render with the released box weights is pending, so the box in the demo may differ from what the released model outputs.** Glance-Stream-0.8B watching a 36 s kitchen clip at 30 fps with four rules (real model outputs, rendered by
 [`examples/make_demo.py`](examples/make_demo.py); the raw readouts are in
 [`assets/demo_predictions.json`](assets/demo_predictions.json)). Bars show p(yes) with the 0.5 threshold, the strips
 show its history, red triangles are alerts. No hand-washing happens in the clip, so every cutting segment violates the
@@ -155,7 +155,7 @@ Only final results are listed; protocols in [docs/EVALUATION.md](docs/EVALUATION
 | What | Data | Result |
 |---|---|---|
 | False alarms per rule-hour on cross-time rules, at 80% event recall | 22 EPIC-KITCHENS-100 streams from 10 participants, never trained on | **289.9 → 173.4** against the same recipe without rule training (p = 0.002 over participants) |
-| Box Acc@0.5 (person descriptions) | HC-STVG v2 test, 267 clips, 2 fps | **43.7** |
+| Box Acc@0.5 (person descriptions) | HC-STVG v2 test, 267 clips, 2 fps | **48.5** |
 | Latency per frame, fused engine: write + 8 rules + 1 box, 30 fps arrivals | RTX PRO 6000, one stream, ~30k-token window | **P50 23.0 ms, P99 24.3 ms** |
 
 At the same target recall, rule training cuts false alarms on rules that depend on what happened before by 40%. The

@@ -2,6 +2,10 @@
 
 ## 0.1.0 (unreleased, private preview)
 
+- Box weights replaced by the 1,500-step box adapter and head (HC-STVG v2, 267 test clips: Acc@0.5 48.5, was 43.7 with
+  the 600-step version). The rule adapter is unchanged (byte-identical). The demo is still rendered with the earlier
+  box weights until it is re-rendered.
+
 - First release of Glance-Stream-0.8B: Qwen3.5-0.8B with a rule-question adapter, a box-question adapter and a box
   head ([Vision-Decision/Glance-Stream-0.8B](https://huggingface.co/Vision-Decision/Glance-Stream-0.8B)).
 - `glance_stream` package: `GlanceStream.from_pretrained`, `Monitor.run` / `Monitor.feed` for files and live frames,

@@ -36,8 +36,9 @@ evaluated, and loading both in one model changes neither output (checked on GPU,
 
 | | Glance-Stream-0.8B |
 |---|---:|
-| Acc@0.5 (box IoU ≥ 0.5 with the annotated person, readouts inside the annotated tube) | **43.7** |
+| Acc@0.5 (box IoU ≥ 0.5 with the annotated person, readouts inside the annotated tube) | **48.5** |
 
+- **Weights.** The released box adapter and head (1,500 training steps; the earlier 600-step version reached 43.7 on the same clips).
 - **Clips.** 267 HC-STVG v2 test clips (a fixed list; the first 300 after a seeded shuffle, minus 33 clips whose video
   could not be obtained). Each clip is streamed at 2 fps, 256×256, with a 4–60 s window; one box readout per second.
 - **Question.** `Where is the person described as "<HC-STVG caption>" right now? Answer with a box.` The box head
@@ -61,7 +62,7 @@ evaluated, and loading both in one model changes neither output (checked on GPU,
 
 ## Composite check (release weights)
 
-On one 36 s kitchen clip at 30 fps with four rules and one box (RTX A6000, reference engine): the rule probabilities of
+On one 36 s kitchen clip at 30 fps with four rules and one box (reference engine; repeated for the released 1,500-step box weights on an A100): the rule probabilities of
 the released model are bit-identical to those of the rule-training checkpoint alone, and its boxes are bit-identical to
 those of the box checkpoint alone. Box questions use their own adapter and rule questions theirs; the video path uses
 neither, so the two cannot interact. The script that ran this check is not part of the package; its output is in the
