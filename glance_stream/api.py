@@ -26,7 +26,6 @@ from glance_stream.rules import Rule, Trigger
 
 REPO = "Vision-Decision/Glance-Stream-0.8B"
 ASSIST = "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
-ENGINES = ("reference", "fused")
 
 
 def box_question_ids(tok, description):
@@ -73,7 +72,7 @@ class Readout:
     on: dict                                    # rule name -> p >= the rule's threshold
     alerts: list                                # rule names whose trigger fired at this readout
     boxes: dict = field(default_factory=dict)   # rule name -> Box (rules with `box`, every readout)
-    ms: float = 0.0                             # wall time of the readout (questions + boxes; fused: write + read)
+    ms: float = 0.0                             # wall time of the readout (rule questions + boxes)
 
     def as_dict(self):
         d = dict(t=round(self.t, 4), p={k: round(v, 5) for k, v in self.p.items()}, on=self.on, alerts=self.alerts,
@@ -86,25 +85,18 @@ class Readout:
 class GlanceStream:
     """Qwen3.5-0.8B base + a rule-question LoRA + a box LoRA and box head. The video path always runs the base weights."""
 
-    def __init__(self, model, tok, config, text_params, box_params, box_head, engine="reference", vision="hf"):
-        if engine not in ENGINES:
-            raise ValueError(f"engine must be one of {ENGINES}")
-        if engine == "fused" and not torch.cuda.is_available():
-            raise RuntimeError("the fused engine needs a CUDA GPU (Triton kernels); use engine='reference'")
+    def __init__(self, model, tok, config, text_params, box_params, box_head):
         self.model, self.tok, self.config = model, tok, config
         self.lm = model.model.language_model
         self.text_params, self.box_params, self.box_head = text_params, box_params, box_head
         self.mods = heads.lora_modules(self.lm)
-        self.engine, self.vision = engine, vision
         self.device = next(model.parameters()).device
         self.yn = yes_no_ids(tok)
 
     @classmethod
-    def from_pretrained(cls, path=REPO, *, revision=None, device=None, dtype=None, engine="reference", vision="hf",
-                        base_model=None, token=None):
+    def from_pretrained(cls, path=REPO, *, revision=None, device=None, dtype=None, base_model=None, token=None):
         """path: a Hugging Face repo id or a local directory with config.json and the safetensors files.
-        engine: 'reference' (the engine every published number was measured with; CUDA, or CPU in fp32) or 'fused'
-        (the single-pass static engine, CUDA only; see docs/ENGINE.md for its equivalence status)."""
+        base_model: local path or id of the base model (default: the one named in config.json)."""
         from safetensors.torch import load_file
         if os.path.isdir(path):
             local = path
@@ -145,7 +137,7 @@ class GlanceStream:
         bh = cfg["box_head"]
         box_head = BoxReadout(lm.embed_tokens.weight, D=lm.embed_tokens.embedding_dim, layer=bh["layer"]).to(device).eval()
         box_head.load_state_dict(load_file(os.path.join(local, bh["file"])))
-        return cls(model, tok, cfg, text_params, box_params, box_head, engine=engine, vision=vision)
+        return cls(model, tok, cfg, text_params, box_params, box_head)
 
     def monitor(self, rules, every=None, window=None):
         """rules: Rule objects (or plain strings = custom yes/no questions). every: readout period in seconds
@@ -167,13 +159,7 @@ class Monitor:
         w = dict(full_s=sc["full_s"], sub_s=sc["sub_s"], sub_fps=sc["sub_fps"])
         w.update(window or {})
         self.box_rules = [i for i, r in enumerate(rules) if r.box]
-        if gs.engine == "fused":
-            from glance_stream.engine.static import StaticStream
-            self.st = StaticStream(gs.model, gs.tok, attention="shared", lora="grouped", vision=gs.vision, **w)
-            self.text_bank = self.st.register_bank("rules", gs.text_params)
-            self.box_bank = self.st.register_bank("box", gs.box_params or gs.text_params) if self.box_rules else None
-        else:
-            self.st = Stream(gs.model, gs.tok, **w)
+        self.st = Stream(gs.model, gs.tok, **w)
         self.st.vis_layer = gs.box_head.layer if self.box_rules else None
         self.questions = [r.question() for r in rules]
         self.qids = [self.st.question_ids(q) for q in self.questions]
@@ -236,7 +222,7 @@ class Monitor:
             return out
         if self.next_read is None:
             self.next_read = (math.floor(float(times[0]) / self.every) + 1) * self.every
-        chunk = 1 if self.gs.engine == "fused" else max(1, round(fps * self.every))
+        chunk = max(1, round(fps * self.every))
         for a in range(0, len(times), 256):
             fr = frames[a:a + 256]
             vis, grid = self.st.encode(video.pairs(fr, self.prev if a == 0 else frames[a - 1], device=self.gs.device))
@@ -245,16 +231,6 @@ class Monitor:
                 due = ts[-1] + 1e-6 >= self.next_read
                 if due:
                     self.next_read = (math.floor(ts[-1] / self.every + 1e-6) + 1) * self.every
-                if due and self.gs.engine == "fused":
-                    self._sync()
-                    t0 = time.perf_counter()
-                    r = self.st.step(vis[b:b + 1], ts, grid, judgements=self.qids, judgement_bank=self.text_bank,
-                                     boxes=self.box_qids, box_head=self.gs.box_head if self.box_qids else None,
-                                     box_bank=self.box_bank)
-                    self._sync()
-                    out.append(self._readout(ts[-1], r["p_yes"], r["boxes"] if self.box_qids else None,
-                                             (time.perf_counter() - t0) * 1e3))
-                    continue
                 self.st.write(vis[b:b + len(ts)], ts, grid)
                 if due:
                     self._sync()

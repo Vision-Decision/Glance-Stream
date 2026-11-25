@@ -11,6 +11,6 @@
 - `glance_stream` package: `GlanceStream.from_pretrained`, `Monitor.run` / `Monitor.feed` for files and live frames,
   seven rule types with the trained wording, the alert trigger used in evaluation, and the reference rule engine
   (`violations`) for scoring your own annotated videos.
-- Two engines: the reference streaming engine (default; all accuracy numbers) and the fused single-pass engine
-  (CUDA, Triton 3.8; latency number; on an earlier 0.8B checkpoint it did not pass its fixed equivalence criterion; re-test pending).
+- One streaming engine (all numbers). The fused single-pass engine and its latency number were removed from this
+  release while the engine is being verified; it is planned for a later release.
 - Examples: `run_rules.py` for your own video, `make_demo.py` to render rule states, alerts and boxes over a video.

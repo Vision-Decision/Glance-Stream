@@ -28,7 +28,7 @@ target recall. It is a non-commercial research prototype for indoor scenes, not 
 [`examples/make_demo.py`](examples/make_demo.py); the raw readouts are in
 [`assets/demo_predictions.json`](assets/demo_predictions.json)). Bars show p(yes) with the 0.5 threshold, the strips
 show its history, red triangles are alerts. No hand-washing happens in the clip, so every cutting segment violates the
-last rule. One alert is wrong: "holding a knife" fires at 11.5 s, just after the knife was put down. Footage: Anna Shvets / Pexels. Also as [MP4](assets/demo.mp4).</sub>
+last rule. One alert is wrong: "holding a knife" fires at 11.5 s, just after the knife was put down. Footage: Anna Shvets / Pexels ([Pexels License](https://www.pexels.com/license/)). Also as [MP4](assets/demo.mp4).</sub>
 
 ## Quick start
 
@@ -143,10 +143,8 @@ python -m pytest tests                                      # rule engine and wo
 
 `examples/make_demo.py` also needs `ffmpeg` on PATH.
 
-Two engines run the same model ([docs/ENGINE.md](docs/ENGINE.md)): `engine="reference"` (default, the one every
-accuracy number was measured with) and `engine="fused"` (one fused forward per frame, CUDA and Triton 3.8 only; not
-bit-identical to the reference; on an earlier 0.8B checkpoint it did not pass its fixed equivalence criterion, a re-test
-is pending, and the released weights have not been compared across engines).
+One streaming engine ([docs/ENGINE.md](docs/ENGINE.md)) runs the model; an optimised engine is being verified and is
+planned for a later release.
 
 ## Results
 
@@ -156,13 +154,10 @@ Only final results are listed; protocols in [docs/EVALUATION.md](docs/EVALUATION
 |---|---|---|
 | False alarms per rule-hour on cross-time rules, at 80% event recall | 22 EPIC-KITCHENS-100 streams from 10 participants, never trained on | **289.9 → 173.4** against the same recipe without rule training (p = 0.002 over participants) |
 | Box Acc@0.5 (person descriptions) | HC-STVG v2 test, 267 clips, 2 fps | **48.5** |
-| Latency per frame, fused engine: write + 8 rules + 1 box, 30 fps arrivals | RTX PRO 6000, one stream, ~30k-token window | **P50 23.0 ms, P99 24.3 ms** |
 
 At the same target recall, rule training cuts false alarms on rules that depend on what happened before by 40%. The
 absolute level is still high: this is a research prototype, not an alert-free monitor. Thresholds were chosen for 80% event recall on held-out
-participants; alerts need 2 consecutive readouts and have a 5 s cooldown. The accuracy numbers come from the default
-reference engine; the latency comes from the fused engine, measured with shape-matched stand-in weights (latency does
-not depend on the weight values).
+participants; alerts need 2 consecutive readouts and have a 5 s cooldown.
 
 ## Limitations
 
@@ -190,7 +185,6 @@ not depend on the weight values).
 | `glance_stream/api.py` | `GlanceStream`, `Monitor`, `Readout`, `Box` |
 | `glance_stream/rules.py` | rule types and wording, alert trigger, reference rule engine (`violations`) |
 | `glance_stream/model/` | reference streaming engine (`stream.py`), attention without boolean masks, LoRA, box head |
-| `glance_stream/engine/` | fused single-pass engine (CUDA, Triton) |
 | `glance_stream/video.py` | decoding at a fixed fps, tubelet pairs |
 | `examples/` | `run_rules.py` (your video), `make_demo.py` (render), `kitchen_rules.json` |
 | `docs/` | [EVALUATION.md](docs/EVALUATION.md), [ENGINE.md](docs/ENGINE.md), [DATA.md](docs/DATA.md) |

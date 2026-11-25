@@ -47,19 +47,6 @@ evaluated, and loading both in one model changes neither output (checked on GPU,
 - **Scope.** HC-STVG describes people, so the head was trained and tested on person descriptions only. Objects ("the
   knife") are untested.
 
-## 3. Latency (fused engine, RTX PRO 6000)
-
-| per frame, 30 fps arrival, 1 stream | P50 | P99 |
-|---|---:|---:|
-| write + 8 rule questions + 1 box, arrival to all results ready | 23.0 ms | 24.3 ms |
-
-- RTX PRO 6000 Blackwell Server Edition, bf16, 600 s memory window after a 600 s warm-up (about 30k cached tokens), 1,000
-  measured frames, video decoding, vision tower and the fused step included; no frame dropped, no queue built up.
-  torch 2.14.1 (CUDA 13.0), transformers 5.23.0, flash-linear-attention 0.6.0, Triton 3.8.0.
-- This is the **fused** engine (`engine="fused"`), measured with shape-matched stand-in weights (latency does not depend on the
-  weight values). The default reference engine, which produced every accuracy number above, is slower and was not
-  benchmarked for this release. See [ENGINE.md](ENGINE.md).
-
 ## Composite check (release weights)
 
 On one 36 s kitchen clip at 30 fps with four rules and one box (reference engine; repeated for the released 1,500-step box weights on an A100): the rule probabilities of
@@ -70,7 +57,7 @@ model repository (`checks/independence.json`).
 
 ## Not measured for this release
 
-- Accuracy of the fused engine on these benchmarks (see ENGINE.md for its equivalence status).
+- Speed: this release reports no latency number; the optimised engine is planned for a later release.
 - Any rule wording other than the templates, and Chinese rules (training included Chinese phrasings; evaluation did
   not).
 - Boxes for objects, boxes at 30 fps (the box benchmark streams at 2 fps), and calibration of p(yes) for cross-time

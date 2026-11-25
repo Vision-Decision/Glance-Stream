@@ -17,7 +17,7 @@ Glance-Stream 每 0.5 秒对所有规则同时给出一次判断。每条规则�
 
 ![Glance-Stream-0.8B 在一段厨房视频上：四条常驻规则、报警和框（真实模型输出）](assets/demo.gif)
 
-<sub>Glance-Stream-0.8B 以 30 fps 观看一段 36 秒的厨房视频，同时挂四条规则。画面是真实模型输出，由 [`examples/make_demo.py`](examples/make_demo.py) 渲染，原始读出在 [`assets/demo_predictions.json`](assets/demo_predictions.json)。条形是 p(yes)，竖线是 0.5 阈值；右侧曲线是历史；红色三角是报警。片中没有洗手，所以每段切菜都违反最后一条规则。有一次报警是错的：11.5 秒刚放下刀时，"holding a knife" 仍然报警。素材：Anna Shvets / Pexels。另有 [MP4](assets/demo.mp4)。</sub>
+<sub>Glance-Stream-0.8B 以 30 fps 观看一段 36 秒的厨房视频，同时挂四条规则。画面是真实模型输出，由 [`examples/make_demo.py`](examples/make_demo.py) 渲染，原始读出在 [`assets/demo_predictions.json`](assets/demo_predictions.json)。条形是 p(yes)，竖线是 0.5 阈值；右侧曲线是历史；红色三角是报警。片中没有洗手，所以每段切菜都违反最后一条规则。有一次报警是错的：11.5 秒刚放下刀时，"holding a knife" 仍然报警。素材：Anna Shvets / Pexels（[Pexels License](https://www.pexels.com/license/)）。另有 [MP4](assets/demo.mp4)。</sub>
 
 ## 快速开始
 
@@ -108,7 +108,7 @@ python -m pytest tests                                      # 规则引擎和措
 | CUDA | 基座 bf16，adapter fp32 | 装上 `flash-linear-attention` 可用快速递归内核 |
 | CPU | fp32 | 能跑，远达不到实时 |
 
-两个引擎跑的是同一个模型（见 [docs/ENGINE.md](docs/ENGINE.md)）：`engine="reference"` 是默认值，所有准确率数字都用它测得；`engine="fused"` 每帧一次融合前向，仅支持 CUDA 和 Triton 3.8。融合引擎与参考引擎不逐位一致，在更早的 0.8B 检查点上没有通过事先固定的等价判据，复测待做，发布权重也还没有做过跨引擎比较。
+模型由一个流式引擎运行（见 [docs/ENGINE.md](docs/ENGINE.md)）。优化引擎在验证中，计划在后续版本发布。
 
 ## 结果
 
@@ -118,9 +118,7 @@ python -m pytest tests                                      # 规则引擎和措
 |---|---|---|
 | 跨时间规则的误报/规则·小时（事件召回 80%） | EPIC-KITCHENS-100 的 22 条长流，来自 10 名参与者，均未参与训练 | 对照为同配方但不含规则训练：**289.9 → 173.4**（按参与者配对，p = 0.002） |
 | 框 Acc@0.5（人物描述） | HC-STVG v2 测试集 267 段，2 fps | **48.5** |
-| 每帧时延，融合引擎：写入 + 8 条规则 + 1 个框，30 fps 到帧 | RTX PRO 6000，单路，约 30k token 窗口 | **P50 23.0 ms，P99 24.3 ms** |
 
-时延数字来自融合引擎，测量时用的是形状一致的替身权重（时延与权重取值无关）。准确率数字来自默认的参考引擎。
 
 ## 已知局限
 

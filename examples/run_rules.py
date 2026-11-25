@@ -30,7 +30,6 @@ def main():
     ap.add_argument("--rules", help="JSON file with a list of rules (default: three kitchen rules)")
     ap.add_argument("--rule", action="append", default=[], help="a custom yes/no question; repeatable")
     ap.add_argument("--model", default="Vision-Decision/Glance-Stream-0.8B")
-    ap.add_argument("--engine", default="reference", choices=("reference", "fused"))
     ap.add_argument("--base_model", help="local path or id of Qwen3.5-0.8B (default: from the model's config)")
     ap.add_argument("--fps", type=float, default=30)
     ap.add_argument("--every", type=float, default=0.5, help="readout period in seconds")
@@ -46,8 +45,8 @@ def main():
         for r in rules:
             r.threshold = a.threshold
     t = time.perf_counter()
-    gs = GlanceStream.from_pretrained(a.model, engine=a.engine, base_model=a.base_model)
-    print(f"loaded {a.model} on {gs.device} ({a.engine} engine) in {time.perf_counter() - t:.1f} s")
+    gs = GlanceStream.from_pretrained(a.model, base_model=a.base_model)
+    print(f"loaded {a.model} on {gs.device} in {time.perf_counter() - t:.1f} s")
     for r in rules:
         print(f"  rule: {r.name}" + (f"  [box: {r.box}]" if r.box else ""))
 
@@ -64,7 +63,7 @@ def main():
     span = readouts[-1].t if readouts else 0
     print(f"{len(readouts)} readouts over {span:.1f} s of video in {wall:.1f} s wall time")
     if a.out:
-        json.dump(dict(model=a.model, engine=a.engine, video=a.video, fps=a.fps, every=a.every, start=a.start,
+        json.dump(dict(model=a.model, video=a.video, fps=a.fps, every=a.every, start=a.start,
                        rules=[r.as_dict() for r in rules], questions=[r.question() for r in rules],
                        readouts=[r.as_dict() for r in readouts]), open(a.out, "w"), indent=1)
         print("wrote", a.out)
