@@ -88,7 +88,7 @@ def render(video, pred, out, width=720, start=None, end=None, gif_fps=8, gif_wid
         # header
         y0 = vh
         d.rectangle([0, y0, width, y0 + head_h], fill=PANEL)
-        d.text((12, y0 + 8), title or "Glance-Stream-0.8B · real model outputs", font=f_title, fill=TEXT)
+        d.text((12, y0 + 8), title or f"{P.get('model', 'Glance-Stream').split('/')[-1]} · real model outputs", font=f_title, fill=TEXT)
         clock = f"t = {tf:5.1f} s"
         d.text((width - 12 - d.textlength(clock, font=f_big), y0 + 9), clock, font=f_big, fill=TEXT)
         # one row per rule: name, p(yes) bar with threshold tick, history sparkline with alert marks

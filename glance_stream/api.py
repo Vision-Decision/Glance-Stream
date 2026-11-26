@@ -83,7 +83,7 @@ class Readout:
 
 
 class GlanceStream:
-    """Qwen3.5-0.8B base + a rule-question LoRA + a box LoRA and box head. The video path always runs the base weights."""
+    """Qwen3.5 base (0.8B or 4B) + a rule-question LoRA + a box LoRA and box head. The video path always runs the base weights."""
 
     def __init__(self, model, tok, config, text_params, box_params, box_head):
         self.model, self.tok, self.config = model, tok, config

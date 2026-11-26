@@ -29,8 +29,9 @@ def main():
     ap.add_argument("video")
     ap.add_argument("--rules", help="JSON file with a list of rules (default: three kitchen rules)")
     ap.add_argument("--rule", action="append", default=[], help="a custom yes/no question; repeatable")
-    ap.add_argument("--model", default="Vision-Decision/Glance-Stream-0.8B")
-    ap.add_argument("--base_model", help="local path or id of Qwen3.5-0.8B (default: from the model's config)")
+    ap.add_argument("--model", default="Vision-Decision/Glance-Stream-0.8B",
+                    help="Hugging Face repo id or local directory (e.g. Vision-Decision/Glance-Stream-4B)")
+    ap.add_argument("--base_model", help="local path or id of the base model (default: from the model's config)")
     ap.add_argument("--fps", type=float, default=30)
     ap.add_argument("--every", type=float, default=0.5, help="readout period in seconds")
     ap.add_argument("--start", type=float, default=0)
