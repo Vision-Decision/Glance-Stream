@@ -1,9 +1,11 @@
 # Training and evaluation data
 
-No video is redistributed in this repository or in the model repository. The demo clip is a Pexels video (see the
+No video is redistributed in this repository or in the model repositories. The demo clip is a Pexels video (see the
 README).
 
 ## Training
+
+Glance-Stream-0.8B and Glance-Stream-4B were trained on the same data.
 
 | Source | Used for | Licence / terms |
 |---|---|---|
@@ -12,8 +14,8 @@ README).
 | [RepCount-A](https://svip-lab.github.io/dataset/RepCount_dataset.html) (train) | repetition counting | **unclear**: we found no explicit licence in the public release; the authors distribute it for research, and we treat it as research use only |
 | [HC-STVG v2](https://github.com/tzhhhh123/HC-STVG) (train) | box questions (person descriptions with a box per frame) | **unclear**: we found no explicit licence in the public release; the authors distribute it for research, and we treat it as research use only |
 | Rule sentences | cross-time rules over the Charades training streams: the rule engine (`glance_stream/rules.py`) computes every label from the human Charades annotations; rule wordings (English and Chinese, colloquial and formal) were written by Claude Opus 5.5 from the rule's structured form and kept only if a blind back-parse recovered the same rule | labels: derived from Charades; wordings: generated |
-| Box head initialisation | the box head started from the box head of a 0.8B image Glance model (trained on RefCOCO/+/g, gRefCOCO and COCO-based grounding data; see [Glance](https://github.com/Vision-Decision/Glance)) | includes non-commercial sources (gRefCOCO) |
-| [Qwen/Qwen3.5-0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B) | base model, frozen | Apache-2.0 |
+| Box head initialisation | the box head started from the box head of an image Glance model of the same size, 0.8B or 4B (trained on RefCOCO/+/g, gRefCOCO and COCO-based grounding data; see [Glance](https://github.com/Vision-Decision/Glance)) | includes non-commercial sources (gRefCOCO) |
+| [Qwen/Qwen3.5-0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B), [Qwen/Qwen3.5-4B](https://huggingface.co/Qwen/Qwen3.5-4B) | base models (Glance-Stream-0.8B, Glance-Stream-4B), frozen | Apache-2.0 |
 
 Train and evaluation sets are separated by video id. Several sources are for non-commercial research use only, and
 two (RepCount-A, HC-STVG) have no explicit licence we could find, so the weights are released under **CC BY-NC 4.0**
@@ -26,6 +28,7 @@ this release, please open an issue.
 |---|---|---|
 | [EPIC-KITCHENS-100](https://epic-kitchens.github.io/) | 22 long kitchen streams (10 participants) with rules generated from the action annotations; evaluation only, never trained on | CC BY-NC 4.0 |
 | HC-STVG v2 (test) | box accuracy, 267 clips | unclear, as above (research use only) |
+| Charades (test), Charades-STA (test) | 48 ten-minute "now" rule streams spliced from test videos, and short-clip presence / temporal grounding probes (reported for Glance-Stream-4B) | as above |
 
 ## Demo footage
 
