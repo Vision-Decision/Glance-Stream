@@ -1,9 +1,9 @@
 # Glance-Stream
 
-**给实时视频流挂上一组常驻规则：一个 0.8B 模型每半秒把所有是非规则一起判断一遍（评测中每条流 16 条），包括"之前发生过什么"这类跨时间的规则，需要时还给出规则所指那个人的框。**
+**给实时视频流挂上一组常驻规则：一个小模型（0.8B，另有 4B）每半秒把所有是非规则一起判断一遍（评测中每条流 16 条），包括"之前发生过什么"这类跨时间的规则，需要时还给出规则所指那个人的框。**
 
-[English](README.md) · [快速开始](#快速开始) · [规则](#规则) · [结果](#结果) · [已知局限](#已知局限) ·
-[Hugging Face 权重](https://huggingface.co/Vision-Decision/Glance-Stream-0.8B) · [更新日志](CHANGELOG.md)
+[English](README.md) · [快速开始](#快速开始) · [4B](#glance-stream-4b) · [规则](#规则) · [结果](#结果) · [已知局限](#已知局限) ·
+Hugging Face 权重：[0.8B](https://huggingface.co/Vision-Decision/Glance-Stream-0.8B)、[4B](https://huggingface.co/Vision-Decision/Glance-Stream-4B) · [更新日志](CHANGELOG.md)
 
 你给一段 30 fps 的视频挂上若干规则，例如：
 
@@ -53,6 +53,30 @@ python examples/run_rules.py my_video.mp4 --rule "Is someone on the phone right 
 python examples/make_demo.py my_video.mp4 readouts.json --out my_demo      # 生成 my_demo.mp4 / my_demo.gif
 ```
 
+## Glance-Stream-4B
+
+同一套配方换到 Qwen3.5-4B 上，加载方式不变：
+
+```python
+gs = GlanceStream.from_pretrained("Vision-Decision/Glance-Stream-4B")     # Qwen3.5-4B（约 9 GB）+ adapter（约 290 MB）
+```
+
+```bash
+python examples/run_rules.py my_video.mp4 --model Vision-Decision/Glance-Stream-4B
+```
+
+![Glance-Stream-4B 在同一段厨房视频上：四条常驻规则、报警和框（真实模型输出）](assets/demo_4B.gif)
+
+<sub>Glance-Stream-4B 在同一段 36 秒视频、同样四条规则上的真实输出，原始读出在 [`assets/demo_predictions_4B.json`](assets/demo_predictions_4B.json)，另有 [MP4](assets/demo_4B.mp4)。和 0.8B 的演示相比：11.5 秒刀已经放下时不再误报 "holding a knife"；框出现得多得多（77% 的读出 p(present) ≥ 0.5，0.8B 是 36%，而人物全程在画面里）。但它没看出 6.5 秒左右又切了一下，持刀报警晚了一秒（7.5 秒），这段切菜也没有报警。"hands washed" 规则跟着切菜段走，但概率一直在阈值附近（0.4–0.65）。本次运行的显存峰值 12.5 GB（RTX A6000，bf16）。</sub>
+
+| | 0.8B | 4B |
+|---|---:|---:|
+| 跨时间规则误报/规则·小时（召回 80%，EPIC-KITCHENS 22 条流；同尺寸对照 → 规则训练后） | 289.9 → 173.4 | 162.8 → 93.3 |
+| 框 Acc@0.5（HC-STVG v2，267 段） | **48.5** | 45.7 |
+| "现在有没有 X" 规则的不遗忘检验（48 条流，相对同尺寸对照） | 未能证明 | 通过 |
+
+4B 在跨时间规则上的误报更少，0.8B 的人物框更准。**4B 事先登记的主检验没有通过**：在为它固定的 8 条流、6 名参与者上，误报从每规则·小时 152.8 次降到 76.5 次，但有 1 人反向，p = 0.0625，没有达到要求的 p ≤ 0.05。共同主检验（macro AUROC +0.073，p = 0.031）、22 条流上的误报下降（p = 0.004）和全部不遗忘检验都通过。两个尺寸用同一套协议分别评测，但不在同一种硬件上，表中跨尺寸的数字只能当作各自的水平看，不是测出来的差。细节见 [docs/EVALUATION.md](docs/EVALUATION.md#3-glance-stream-4b)。
+
 ## 工作方式
 
 - **写入。** 每个帧组只写入一次模型状态。一个帧组是相邻两帧经 Qwen3.5 视觉塔的 2 帧 tubelet 得到的 64 个 token（256×256），每 0.5 秒另加一个文本时间戳。
@@ -60,7 +84,7 @@ python examples/make_demo.py my_video.mp4 readouts.json --out my_demo      # 生
 - **提问。** 每条规则是从当前状态分叉出的一个短问题块，答完即丢弃，不写回状态。所以规则之间互不影响，也不影响流本身。一次读出的所有规则是一次批量前向。
 - **答案。** 取第一个答案 token 上 yes/no 的概率，不生成文本。
 - **框。** 框问题后接一个 latent token，在最后一层读出它的隐状态。读出头在最新帧的 64 个 patch 上选一个，用四个有序边分布给出框，另有 IoU 头和存在头。
-- **适配器。** 规则和框各有一个 LoRA，都只作用于问题 token。视频写入始终走未改动的 Qwen3.5-0.8B，所以两个 LoRA 互不干扰：同一段视频上，发布模型的规则概率与单独的规则检查点逐位一致，框与单独的框检查点逐位一致。
+- **适配器。** 规则和框各有一个 LoRA，都只作用于问题 token。视频写入始终走未改动的 Qwen3.5 基座，所以两个 LoRA 互不干扰：同一段视频上，发布模型的规则概率与单独的规则检查点逐位一致，框与单独的框检查点逐位一致。
 
 跨时间规则由模型直接从流状态**端到端**回答，推理时没有事件检测器或状态机。训练用的就是下面这六种规则类型，标签由规则引擎根据人工事件标注计算。
 
@@ -118,21 +142,25 @@ python -m pytest tests                                      # 规则引擎和措
 |---|---|---|
 | 跨时间规则的误报/规则·小时（事件召回 80%） | EPIC-KITCHENS-100 的 22 条长流，来自 10 名参与者，均未参与训练 | 对照为同配方但不含规则训练：**289.9 → 173.4**（按参与者配对，p = 0.002） |
 | 框 Acc@0.5（人物描述） | HC-STVG v2 测试集 267 段，2 fps | **48.5** |
+| **4B**：跨时间规则的误报/规则·小时（事件召回 80%；事先登记的主检验，**未通过**） | 22 条流中的 8 条，6 名参与者 | 相对 4B 对照 152.8 → 76.5（p = 0.0625，要求 p ≤ 0.05） |
+| **4B**：同上，22 条流（次要分析） | 22 条流，10 名参与者 | 162.8 → 93.3（p = 0.004） |
+| **4B**：框 Acc@0.5 | HC-STVG v2 测试集 267 段，2 fps | 45.7 |
 
 
 ## 已知局限
 
 - **计数类规则报得偏多。** 对"T 秒内最多 N 次"这类规则，模型判"超限"的次数多于实际。
 - **"A 之后 T 秒内必须有 B"不可靠。** 在评测中，这类规则的排序能力没有显著高于随机。模型学会了"没有 A 就不报"，但分不清"B 已经来了"和"B 还没来"。演示里冰箱这条规则一直没有报警，对这段视频是对的，但不要依赖这类规则。
-- **简单规则上没能证明不比对照差。** 另一个"现在有没有 X"的部署评测（48 条 10 分钟流）上，误报与对照基本持平，但没能在事先设定的 10% 非劣效界值内证明不比对照差。
+- **0.8B：简单规则上没能证明不比对照差。** 另一个"现在有没有 X"的部署评测（48 条 10 分钟流）上，0.8B 的误报与对照基本持平，但没能在事先设定的 10% 非劣效界值内证明不比对照差。（4B 通过了这项检验。）
+- **4B：主检验没有通过**（6 名参与者上 p = 0.0625，见上），框也不如 0.8B。
 - **阈值需要自己调。** 0.5 只是起点。跨时间规则的概率没有校准，请在自己的标注视频上逐条规则选阈值。
 - **框只针对人。** 框头只在人物描述上训练和评测过，评测为 2 fps，从 256×256 的帧上读出。给物体画框没有测过。
 - **领域有限。** 训练数据是室内家居视频（Charades），评测是厨房场景。只评测过模板措辞；中文和自由措辞的规则在训练中出现过，但没有评测。
-- **只有 0.8B。** 本版本只回答是非和框，不输出时间戳或计数。
+- **两个尺寸：0.8B 和 4B。** 本版本只回答是非和框，不输出时间戳或计数。以上局限除标明尺寸的以外，两个尺寸都适用。
 
 ## 许可
 
 - 代码：Apache-2.0。
 - 权重：**CC BY-NC 4.0，仅限非商业用途**。训练数据包含仅限非商用和仅限研究用途的来源，见 [docs/DATA.md](docs/DATA.md)。
-- 基座模型 Qwen/Qwen3.5-0.8B：Apache-2.0。
-- 演示素材：Anna Shvets 的 [Woman Chopping Bell Pepper](https://www.pexels.com/video/woman-chopping-bell-pepper-6617422/)，遵循 [Pexels License](https://www.pexels.com/license/)。仓库只收录渲染后的演示视频，不含原片。
+- 基座模型 Qwen/Qwen3.5-0.8B、Qwen/Qwen3.5-4B：Apache-2.0。
+- 演示素材（两段演示相同）：Anna Shvets 的 [Woman Chopping Bell Pepper](https://www.pexels.com/video/woman-chopping-bell-pepper-6617422/)，遵循 [Pexels License](https://www.pexels.com/license/)。仓库只收录渲染后的演示视频，不含原片。

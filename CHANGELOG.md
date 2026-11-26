@@ -1,6 +1,20 @@
 # Changelog
 
-## 0.1.0 (unreleased, private preview)
+## Glance-Stream-4B (2026-11-26, package 0.1.0)
+
+- **Glance-Stream-4B** ([Vision-Decision/Glance-Stream-4B](https://huggingface.co/Vision-Decision/Glance-Stream-4B)):
+  the same recipe on Qwen3.5-4B, a rule adapter (1,200 steps), a box adapter and box head (1,500 steps). Same package
+  and API; load it with `GlanceStream.from_pretrained("Vision-Decision/Glance-Stream-4B")`. Cross-time false alarms
+  per rule-hour against the 4B baseline: 152.8 → 76.5 on the pre-registered 8-stream primary set (p = 0.0625, **primary
+  not met**), 162.8 → 93.3 on 22 streams (p = 0.004); box Acc@0.5 45.7. Rules bit-identical to the rule checkpoint
+  alone and boxes to the box checkpoint alone (`checks/independence.json` in the model repository).
+- 4B demo on the same kitchen clip (`assets/demo_4B.*`, `assets/demo_predictions_4B.json`); the 0.8B demo stays the
+  main one.
+- `examples/make_demo.py` titles the video with the model in the predictions file; `examples/run_rules.py --model`
+  takes either repository.
+- No change to the 0.8B weights or the package code paths.
+
+## 0.1.0
 
 - Box weights replaced by the 1,500-step box adapter and head (HC-STVG v2, 267 test clips: Acc@0.5 48.5, was 43.7 with
   the 600-step version). The rule adapter is unchanged (byte-identical). The demo is re-rendered with the released

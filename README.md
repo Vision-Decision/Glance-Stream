@@ -1,15 +1,17 @@
 # Glance-Stream
 
-**Standing rules over a live video stream: one 0.8B model checks all your yes/no rules together every half second
-(16 per stream in our evaluation), including rules about what happened before, and boxes the person a rule is about.**
+**Standing rules over a live video stream: one small model (0.8B, or 4B) checks all your yes/no rules together every
+half second (16 per stream in our evaluation), including rules about what happened before, and boxes the person a rule
+is about.**
 
 [![Code license: Apache-2.0](https://img.shields.io/badge/code-Apache--2.0-blue.svg)](LICENSE)
 [![Weights license: CC BY-NC 4.0](https://img.shields.io/badge/weights-CC%20BY--NC%204.0-lightgrey.svg)](https://huggingface.co/Vision-Decision/Glance-Stream-0.8B)
 [![Hugging Face: Glance-Stream-0.8B](https://img.shields.io/badge/%F0%9F%A4%97%20weights-Glance--Stream--0.8B-yellow.svg)](https://huggingface.co/Vision-Decision/Glance-Stream-0.8B)
+[![Hugging Face: Glance-Stream-4B](https://img.shields.io/badge/%F0%9F%A4%97%20weights-Glance--Stream--4B-yellow.svg)](https://huggingface.co/Vision-Decision/Glance-Stream-4B)
 
-[中文](README.zh-CN.md) · [Quick start](#quick-start) · [Rules](#rules) · [Results](#results) ·
-[Limitations](#limitations) · [Hugging Face weights](https://huggingface.co/Vision-Decision/Glance-Stream-0.8B) ·
-[Changelog](CHANGELOG.md)
+[中文](README.zh-CN.md) · [Quick start](#quick-start) · [4B](#glance-stream-4b) · [Rules](#rules) · [Results](#results) ·
+[Limitations](#limitations) · Hugging Face weights: [0.8B](https://huggingface.co/Vision-Decision/Glance-Stream-0.8B),
+[4B](https://huggingface.co/Vision-Decision/Glance-Stream-4B) · [Changelog](CHANGELOG.md)
 
 You attach rules to a 30 fps video: "is someone cutting vegetables right now", "whenever the fridge is opened it must be
 closed within 30 seconds", "cutting is only allowed if hands were washed in the minute before". Every 0.5 s Glance-Stream
@@ -65,6 +67,41 @@ python examples/run_rules.py my_video.mp4 --rule "Is someone on the phone right 
 python examples/make_demo.py my_video.mp4 readouts.json --out my_demo      # my_demo.mp4 / my_demo.gif
 ```
 
+## Glance-Stream-4B
+
+The same recipe on Qwen3.5-4B, loaded the same way:
+
+```python
+gs = GlanceStream.from_pretrained("Vision-Decision/Glance-Stream-4B")     # Qwen3.5-4B (about 9 GB) + adapters (about 290 MB)
+```
+
+```bash
+python examples/run_rules.py my_video.mp4 --model Vision-Decision/Glance-Stream-4B
+```
+
+![Glance-Stream-4B on the same kitchen clip: four standing rules, alerts and a box (real model outputs)](assets/demo_4B.gif)
+
+<sub>Glance-Stream-4B on the same 36 s clip and rules as the demo above (real model outputs, raw readouts in
+[`assets/demo_predictions_4B.json`](assets/demo_predictions_4B.json); also as [MP4](assets/demo_4B.mp4)). Against the
+0.8B demo: no wrong "holding a knife" alert at 11.5 s after the knife is put down, and the box is shown far more often
+(p(present) ≥ 0.5 at 77% of readouts, 36% for 0.8B; the woman is in view throughout). It misses that she resumes
+cutting at about 6.5 s, so its knife alert comes a second late (7.5 s) and that cutting segment gets no alert. The
+"hands washed" rule tracks the cutting segments but hovers near the threshold (0.4–0.65). Peak GPU memory for this
+run: 12.5 GB (RTX A6000, bf16).</sub>
+
+| | 0.8B | 4B |
+|---|---:|---:|
+| Cross-time false alarms per rule-hour at 80% recall, 22 EPIC-KITCHENS streams (baseline of the same size → rule-trained) | 289.9 → 173.4 | 162.8 → 93.3 |
+| Box Acc@0.5, HC-STVG v2, 267 clips | **48.5** | 45.7 |
+| "Now" rules, no-forgetting test against its baseline (48 streams) | not established | met |
+
+The 4B model raises fewer false alarms on cross-time rules; the 0.8B model boxes people better. **The pre-registered
+primary 4B test was not met:** on the 8-stream, 6-participant set fixed for it, false alarms fell from 152.8 to 76.5
+per rule-hour, but one participant went the other way and p = 0.0625 (the test required p ≤ 0.05). The co-primary
+ranking test (macro AUROC +0.073, p = 0.031), the 22-stream drop (p = 0.004) and all no-forgetting checks pass. The two
+sizes were evaluated in separate runs with the same protocol but not on the same hardware, so read the rows as levels,
+not a measured difference. Details in [docs/EVALUATION.md](docs/EVALUATION.md#3-glance-stream-4b).
+
 ## How it works
 
 | Part | What it does |
@@ -74,7 +111,7 @@ python examples/make_demo.py my_video.mp4 readouts.json --out my_demo      # my_
 | Rules | every rule is a short question block forked from the current state, answered, and discarded: nothing is written back, so rules never affect each other or the stream; all rules of a readout are one batched forward |
 | Answer | p(yes) from the first answer token, restricted to the yes/no tokens; no text is generated |
 | Boxes | a latent token after the box question is read at the last layer; a choice over the newest frame's 64 patches, four ordinal edge distributions and an IoU head give the box, a presence head says whether the person is there |
-| Adapters | two LoRA adapters (rules, boxes) act only on question tokens; the video path runs the unchanged Qwen3.5-0.8B, so the two cannot interact: on a test clip the released model's rule answers are bit-identical to the rule checkpoint alone and its boxes to the box checkpoint alone |
+| Adapters | two LoRA adapters (rules, boxes) act only on question tokens; the video path runs the unchanged Qwen3.5 base model, so the two cannot interact: on a test clip the released model's rule answers are bit-identical to the rule checkpoint alone and its boxes to the box checkpoint alone |
 
 Cross-time rules are answered **end to end** from the stream state: there is no event detector or state machine at
 inference time. The model was trained on the six rule types below with labels computed by a rule engine from human
@@ -154,6 +191,9 @@ Only final results are listed; protocols in [docs/EVALUATION.md](docs/EVALUATION
 |---|---|---|
 | False alarms per rule-hour on cross-time rules, at 80% event recall | 22 EPIC-KITCHENS-100 streams from 10 participants, never trained on | **289.9 → 173.4** against the same recipe without rule training (p = 0.002 over participants) |
 | Box Acc@0.5 (person descriptions) | HC-STVG v2 test, 267 clips, 2 fps | **48.5** |
+| **4B**: false alarms per rule-hour on cross-time rules, at 80% event recall (pre-registered primary, **not met**) | 8 of the 22 streams, 6 participants | 152.8 → 76.5 against the 4B baseline (p = 0.0625; required p ≤ 0.05) |
+| **4B**: same, 22 streams (secondary) | 22 streams, 10 participants | 162.8 → 93.3 (p = 0.004) |
+| **4B**: box Acc@0.5 | HC-STVG v2 test, 267 clips, 2 fps | 45.7 |
 
 At the same target recall, rule training cuts false alarms on rules that depend on what happened before by 40%. The
 absolute level is still high: this is a research prototype, not an alert-free monitor. Thresholds were chosen for 80% event recall on held-out
@@ -167,16 +207,19 @@ participants; alerts need 2 consecutive readouts and have a 5 s cooldown.
   than chance at ranking readouts. The model learned not to fire when A never happened, but it does not reliably tell
   "B already came" from "B has not come yet". The fridge rule in the demo stays quiet, which is correct for that clip,
   but do not rely on this rule type.
-- **Not shown to be as good as the baseline on simple rules.** On a separate benchmark of "is X happening now" rules
-  (48 ten-minute streams), the rule-trained model's false alarms are on par with the baseline, but the test could not
-  establish that it is no worse within a 10% non-inferiority margin fixed before the test.
+- **0.8B: not shown to be as good as the baseline on simple rules.** On a separate benchmark of "is X happening now"
+  rules (48 ten-minute streams), the rule-trained 0.8B model's false alarms are on par with the baseline, but the test
+  could not establish that it is no worse within a 10% non-inferiority margin fixed before the test. (For 4B this test
+  passes.)
+- **4B: the primary test was not met** (p = 0.0625 on 6 participants, see above), and its boxes are worse than 0.8B's.
 - **Thresholds are not tuned for you.** 0.5 is a starting point and probabilities for cross-time rules are not
   calibrated. Pick thresholds per rule on annotated footage of your own (`violations` computes the ground truth).
 - **Boxes are for people**, trained and tested on person descriptions at 2 fps, read from a 256×256 frame. Object boxes
   are untested.
 - **Domain.** Trained on indoor home clips (Charades), evaluated on kitchens. Only the template wording was evaluated;
   Chinese and free-form rules appeared in training but were not evaluated.
-- **0.8B only**, and no timestamps or counts as answers in this release (yes/no and boxes only).
+- **Two sizes, 0.8B and 4B**, and no timestamps or counts as answers in this release (yes/no and boxes only). The
+  limitations above apply to both sizes unless marked.
 
 ## Repository
 
@@ -192,12 +235,13 @@ participants; alerts need 2 consecutive readouts and have a 5 s cooldown.
 ## License
 
 - **Code**: [Apache-2.0](LICENSE).
-- **Weights** ([Vision-Decision/Glance-Stream-0.8B](https://huggingface.co/Vision-Decision/Glance-Stream-0.8B)):
+- **Weights** ([Vision-Decision/Glance-Stream-0.8B](https://huggingface.co/Vision-Decision/Glance-Stream-0.8B),
+  [Vision-Decision/Glance-Stream-4B](https://huggingface.co/Vision-Decision/Glance-Stream-4B)):
   **CC BY-NC 4.0, non-commercial use only.** The training data includes non-commercial and research-only sources; see
   [docs/DATA.md](docs/DATA.md).
-- **Base model** [Qwen/Qwen3.5-0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B): Apache-2.0, downloaded from its own
-  repository.
-- **Demo footage**: [Woman Chopping Bell Pepper](https://www.pexels.com/video/woman-chopping-bell-pepper-6617422/) by
+- **Base models** [Qwen/Qwen3.5-0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B) and
+  [Qwen/Qwen3.5-4B](https://huggingface.co/Qwen/Qwen3.5-4B): Apache-2.0, downloaded from their own repositories.
+- **Demo footage** (both demos): [Woman Chopping Bell Pepper](https://www.pexels.com/video/woman-chopping-bell-pepper-6617422/) by
   Anna Shvets, [Pexels License](https://www.pexels.com/license/); only the rendered demo is included.
 
 ## Citation
@@ -208,13 +252,13 @@ participants; alerts need 2 consecutive readouts and have a 5 s cooldown.
   author = {Vision-Decision},
   year   = {2026},
   url    = {https://github.com/Vision-Decision/Glance-Stream},
-  note   = {Glance-Stream-0.8B, https://huggingface.co/Vision-Decision/Glance-Stream-0.8B}
+  note   = {Glance-Stream-0.8B and Glance-Stream-4B, https://huggingface.co/Vision-Decision}
 }
 ```
 
 ## Acknowledgements
 
-- The [Qwen](https://huggingface.co/Qwen) team for Qwen3.5-0.8B, and Hugging Face `transformers`.
+- The [Qwen](https://huggingface.co/Qwen) team for Qwen3.5-0.8B and Qwen3.5-4B, and Hugging Face `transformers`.
 - [flash-linear-attention](https://github.com/fla-org/flash-linear-attention) for the Gated-DeltaNet kernels.
 - The authors of Charades, Charades-STA, RepCount-A, HC-STVG and EPIC-KITCHENS-100.
 - Anna Shvets for the demo footage.

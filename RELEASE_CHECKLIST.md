@@ -30,6 +30,16 @@ Both repositories stay **private** until the paper is posted on arXiv; they are 
       explicit licence (RepCount-A, HC-STVG).
 - [ ] Demo footage credited (Anna Shvets / Pexels, Pexels License); the original video file is not in the repository.
 
+## Glance-Stream-4B
+
+- [ ] Hugging Face `Vision-Decision/Glance-Stream-4B` holds `text_lora`, `box_lora`, `box_head`, `config.json`,
+      `checks/independence.json`, the model card and `assets/demo.gif`; `assets/demo_4B.*` were rendered from exactly
+      these files (sha256 checked in the render job).
+- [ ] The card says plainly that the pre-registered primary 4B test was not met (p = 0.0625) and keeps the boxes-worse
+      line.
+- [ ] Visibility → public at the same moment as the README links to it are pushed to `main`.
+- [ ] The 0.8B model card's "0.8B only" limitation is replaced by a link to the 4B repository.
+
 ## Switching to public
 
 - [ ] GitHub `Vision-Decision/Glance-Stream`: visibility → public; add topics and the Hugging Face link.
