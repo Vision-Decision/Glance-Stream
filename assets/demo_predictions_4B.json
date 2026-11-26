@@ -1,0 +1,2203 @@
+{
+ "model": "Vision-Decision/Glance-Stream-4B",
+ "engine": "reference",
+ "video": "6617422-hd_1920_1080_30fps.mp4",
+ "source": {
+  "title": "Woman Chopping Bell Pepper",
+  "author": "Anna Shvets",
+  "page": "https://www.pexels.com/video/woman-chopping-bell-pepper-6617422/",
+  "file": "https://videos.pexels.com/video-files/6617422/6617422-hd_1920_1080_30fps.mp4",
+  "sha256": "068c59a56776972c595fae32f502ed838327e5349ce2c2f428452368d70b339a",
+  "license": "Pexels License, https://www.pexels.com/license/"
+ },
+ "hardware": "NVIDIA RTX A6000, bf16, reference engine, weights loaded from the Hugging Face repo (sha256 checked)",
+ "command": "python examples/run_rules.py 6617422-hd_1920_1080_30fps.mp4 --model Vision-Decision/Glance-Stream-4B --rules examples/kitchen_rules.json --out assets/demo_predictions_4B.json",
+ "fps": 30,
+ "every": 0.5,
+ "start": 0,
+ "rules": [
+  {
+   "type": "now",
+   "X": "someone is cutting vegetables",
+   "name": "cutting vegetables",
+   "threshold": 0.5,
+   "k": 2,
+   "cooldown_s": 5.0
+  },
+  {
+   "type": "now",
+   "X": "someone is holding a knife",
+   "name": "holding a knife",
+   "box": "the woman holding a knife",
+   "threshold": 0.5,
+   "k": 2,
+   "cooldown_s": 5.0
+  },
+  {
+   "type": "a_not_followed",
+   "A": "someone opens the fridge",
+   "B": "someone closes the fridge",
+   "T": 30,
+   "name": "fridge closed within 30 s",
+   "threshold": 0.5,
+   "k": 2,
+   "cooldown_s": 5.0
+  },
+  {
+   "type": "b_without_a",
+   "A": "someone washes their hands",
+   "B": "someone is cutting vegetables",
+   "T": 60,
+   "name": "hands washed before cutting",
+   "threshold": 0.5,
+   "k": 2,
+   "cooldown_s": 5.0
+  }
+ ],
+ "questions": [
+  "Is this happening right now: someone is cutting vegetables? Answer yes or no.",
+  "Is this happening right now: someone is holding a knife? Answer yes or no.",
+  "Rule: whenever 'someone opens the fridge' happens, 'someone closes the fridge' must follow within 30 seconds. Is the rule being violated right now? Answer yes or no.",
+  "Rule: 'someone is cutting vegetables' is only allowed if 'someone washes their hands' happened in the 60 seconds before it. Is the rule being violated right now? Answer yes or no."
+ ],
+ "readouts": [
+  {
+   "t": 0.9667,
+   "p": {
+    "cutting vegetables": 0.90465,
+    "holding a knife": 0.9149,
+    "fridge closed within 30 s": 0.00407,
+    "hands washed before cutting": 0.65137
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 195.32,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.15537,
+      0.07977,
+      0.42291,
+      0.84528
+     ],
+     "presence": 0.84511,
+     "confidence": 0.57181
+    }
+   }
+  },
+  {
+   "t": 1.4667,
+   "p": {
+    "cutting vegetables": 0.90465,
+    "holding a knife": 0.9149,
+    "fridge closed within 30 s": 0.0015,
+    "hands washed before cutting": 0.65137
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [
+    "cutting vegetables",
+    "holding a knife",
+    "hands washed before cutting"
+   ],
+   "ms": 143.43,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.0,
+      0.17095,
+      0.36868,
+      0.9364
+     ],
+     "presence": 0.71936,
+     "confidence": 0.65614
+    }
+   }
+  },
+  {
+   "t": 1.9667,
+   "p": {
+    "cutting vegetables": 0.90465,
+    "holding a knife": 0.9149,
+    "fridge closed within 30 s": 0.0015,
+    "hands washed before cutting": 0.65137
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 146.86,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.04739,
+      0.09483,
+      0.53526,
+      0.81804
+     ],
+     "presence": 0.71273,
+     "confidence": 0.58507
+    }
+   }
+  },
+  {
+   "t": 2.4667,
+   "p": {
+    "cutting vegetables": 0.90465,
+    "holding a knife": 0.90465,
+    "fridge closed within 30 s": 0.00133,
+    "hands washed before cutting": 0.62247
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 142.73,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.0855,
+      0.22604,
+      0.39187,
+      0.9151
+     ],
+     "presence": 0.70607,
+     "confidence": 0.4568
+    }
+   }
+  },
+  {
+   "t": 2.9667,
+   "p": {
+    "cutting vegetables": 0.9149,
+    "holding a knife": 0.9149,
+    "fridge closed within 30 s": 0.00133,
+    "hands washed before cutting": 0.65137
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 143.85,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.19947,
+      0.16859,
+      0.43295,
+      0.7391
+     ],
+     "presence": 0.72681,
+     "confidence": 0.64163
+    }
+   }
+  },
+  {
+   "t": 3.4667,
+   "p": {
+    "cutting vegetables": 0.9149,
+    "holding a knife": 0.9149,
+    "fridge closed within 30 s": 0.0015,
+    "hands washed before cutting": 0.59268
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.38,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.06582,
+      0.12866,
+      0.40523,
+      0.90572
+     ],
+     "presence": 0.74299,
+     "confidence": 0.63615
+    }
+   }
+  },
+  {
+   "t": 3.9667,
+   "p": {
+    "cutting vegetables": 0.90465,
+    "holding a knife": 0.90465,
+    "fridge closed within 30 s": 0.00133,
+    "hands washed before cutting": 0.59268
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.38,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.02982,
+      0.23986,
+      0.58551,
+      0.92808
+     ],
+     "presence": 0.73709,
+     "confidence": 0.49995
+    }
+   }
+  },
+  {
+   "t": 4.4667,
+   "p": {
+    "cutting vegetables": 0.90465,
+    "holding a knife": 0.8808,
+    "fridge closed within 30 s": 0.00103,
+    "hands washed before cutting": 0.62247
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 145.15,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.29839,
+      0.20579,
+      0.5521,
+      0.72978
+     ],
+     "presence": 0.72939,
+     "confidence": 0.54451
+    }
+   }
+  },
+  {
+   "t": 4.9667,
+   "p": {
+    "cutting vegetables": 0.9149,
+    "holding a knife": 0.8808,
+    "fridge closed within 30 s": 0.00133,
+    "hands washed before cutting": 0.62247
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.74,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.04701,
+      0.1432,
+      0.55783,
+      0.91215
+     ],
+     "presence": 0.66959,
+     "confidence": 0.50446
+    }
+   }
+  },
+  {
+   "t": 5.4667,
+   "p": {
+    "cutting vegetables": 0.9149,
+    "holding a knife": 0.8808,
+    "fridge closed within 30 s": 0.00133,
+    "hands washed before cutting": 0.59268
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 145.9,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.1909,
+      0.07356,
+      0.4415,
+      0.73224
+     ],
+     "presence": 0.69385,
+     "confidence": 0.68118
+    }
+   }
+  },
+  {
+   "t": 5.9667,
+   "p": {
+    "cutting vegetables": 0.40737,
+    "holding a knife": 0.32086,
+    "fridge closed within 30 s": 0.00247,
+    "hands washed before cutting": 0.43784
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 145.47,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.1647,
+      0.0449,
+      0.43986,
+      0.82515
+     ],
+     "presence": 0.32073,
+     "confidence": 0.67897
+    }
+   }
+  },
+  {
+   "t": 6.4667,
+   "p": {
+    "cutting vegetables": 0.34869,
+    "holding a knife": 0.46883,
+    "fridge closed within 30 s": 0.0017,
+    "hands washed before cutting": 0.43785
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 145.4,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.07893,
+      0.19024,
+      0.46577,
+      0.97934
+     ],
+     "presence": 0.52793,
+     "confidence": 0.62342
+    }
+   }
+  },
+  {
+   "t": 6.9667,
+   "p": {
+    "cutting vegetables": 0.40737,
+    "holding a knife": 0.56221,
+    "fridge closed within 30 s": 0.00218,
+    "hands washed before cutting": 0.40736
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.88,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.20926,
+      0.1233,
+      0.56309,
+      0.80641
+     ],
+     "presence": 0.59478,
+     "confidence": 0.62504
+    }
+   }
+  },
+  {
+   "t": 7.4667,
+   "p": {
+    "cutting vegetables": 0.29426,
+    "holding a knife": 0.83549,
+    "fridge closed within 30 s": 0.0028,
+    "hands washed before cutting": 0.34867
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [
+    "holding a knife"
+   ],
+   "ms": 145.11,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.14163,
+      0.00104,
+      0.55023,
+      0.87877
+     ],
+     "presence": 0.91696,
+     "confidence": 0.48753
+    }
+   }
+  },
+  {
+   "t": 7.9667,
+   "p": {
+    "cutting vegetables": 0.37759,
+    "holding a knife": 0.86704,
+    "fridge closed within 30 s": 0.0028,
+    "hands washed before cutting": 0.40736
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.91,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.10281,
+      0.09466,
+      0.49797,
+      0.86314
+     ],
+     "presence": 0.93261,
+     "confidence": 0.63759
+    }
+   }
+  },
+  {
+   "t": 8.4667,
+   "p": {
+    "cutting vegetables": 0.37759,
+    "holding a knife": 0.86704,
+    "fridge closed within 30 s": 0.00247,
+    "hands washed before cutting": 0.34867
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 145.38,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.12883,
+      0.19097,
+      0.60811,
+      1.0
+     ],
+     "presence": 0.92511,
+     "confidence": 0.38571
+    }
+   }
+  },
+  {
+   "t": 8.5,
+   "p": {
+    "cutting vegetables": 0.43787,
+    "holding a knife": 0.89331,
+    "fridge closed within 30 s": 0.00247,
+    "hands washed before cutting": 0.40736
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.9,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.10245,
+      0.14841,
+      0.59456,
+      0.92428
+     ],
+     "presence": 0.95367,
+     "confidence": 0.381
+    }
+   }
+  },
+  {
+   "t": 9.0,
+   "p": {
+    "cutting vegetables": 0.29425,
+    "holding a knife": 0.73108,
+    "fridge closed within 30 s": 0.0028,
+    "hands washed before cutting": 0.32084
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 145.31,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.29523,
+      0.22731,
+      0.70087,
+      1.0
+     ],
+     "presence": 0.92326,
+     "confidence": 0.55466
+    }
+   }
+  },
+  {
+   "t": 9.5,
+   "p": {
+    "cutting vegetables": 0.20185,
+    "holding a knife": 0.81758,
+    "fridge closed within 30 s": 0.0028,
+    "hands washed before cutting": 0.34867
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 145.12,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.17962,
+      0.2788,
+      0.52197,
+      1.0
+     ],
+     "presence": 0.95853,
+     "confidence": 0.72198
+    }
+   }
+  },
+  {
+   "t": 10.0,
+   "p": {
+    "cutting vegetables": 0.22273,
+    "holding a knife": 0.62249,
+    "fridge closed within 30 s": 0.00247,
+    "hands washed before cutting": 0.26896
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 145.3,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.08421,
+      0.2101,
+      0.43966,
+      0.91006
+     ],
+     "presence": 0.82978,
+     "confidence": 0.58802
+    }
+   }
+  },
+  {
+   "t": 10.5,
+   "p": {
+    "cutting vegetables": 0.18245,
+    "holding a knife": 0.46883,
+    "fridge closed within 30 s": 0.00359,
+    "hands washed before cutting": 0.26896
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 146.01,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.05635,
+      0.05177,
+      0.30314,
+      0.82161
+     ],
+     "presence": 0.46025,
+     "confidence": 0.58118
+    }
+   }
+  },
+  {
+   "t": 11.0,
+   "p": {
+    "cutting vegetables": 0.18246,
+    "holding a knife": 0.40738,
+    "fridge closed within 30 s": 0.0028,
+    "hands washed before cutting": 0.29423
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 145.44,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.08344,
+      0.09335,
+      0.31871,
+      0.83169
+     ],
+     "presence": 0.55601,
+     "confidence": 0.61507
+    }
+   }
+  },
+  {
+   "t": 11.5,
+   "p": {
+    "cutting vegetables": 0.13299,
+    "holding a knife": 0.50004,
+    "fridge closed within 30 s": 0.00461,
+    "hands washed before cutting": 0.20183
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.79,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.31419,
+      0.10658,
+      0.57649,
+      0.86609
+     ],
+     "presence": 0.90461,
+     "confidence": 0.52957
+    }
+   }
+  },
+  {
+   "t": 12.0,
+   "p": {
+    "cutting vegetables": 0.06756,
+    "holding a knife": 0.26899,
+    "fridge closed within 30 s": 0.00758,
+    "hands washed before cutting": 0.0851
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 145.28,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.31909,
+      0.16312,
+      0.60292,
+      0.94583
+     ],
+     "presence": 0.51911,
+     "confidence": 0.64787
+    }
+   }
+  },
+  {
+   "t": 12.5,
+   "p": {
+    "cutting vegetables": 0.04743,
+    "holding a knife": 0.22274,
+    "fridge closed within 30 s": 0.01591,
+    "hands washed before cutting": 0.06755
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 145.3,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.48003,
+      0.19262,
+      0.7963,
+      0.9286
+     ],
+     "presence": 0.1449,
+     "confidence": 0.52242
+    }
+   }
+  },
+  {
+   "t": 13.0,
+   "p": {
+    "cutting vegetables": 0.04209,
+    "holding a knife": 0.16454,
+    "fridge closed within 30 s": 0.01406,
+    "hands washed before cutting": 0.06009
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 145.53,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.60723,
+      0.02555,
+      0.9558,
+      0.82301
+     ],
+     "presence": 0.05184,
+     "confidence": 0.45095
+    }
+   }
+  },
+  {
+   "t": 13.5,
+   "p": {
+    "cutting vegetables": 0.04209,
+    "holding a knife": 0.08511,
+    "fridge closed within 30 s": 0.02596,
+    "hands washed before cutting": 0.09536
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 143.99,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.64146,
+      0.04768,
+      0.96816,
+      0.87795
+     ],
+     "presence": 0.02951,
+     "confidence": 0.39285
+    }
+   }
+  },
+  {
+   "t": 14.0,
+   "p": {
+    "cutting vegetables": 0.03733,
+    "holding a knife": 0.06756,
+    "fridge closed within 30 s": 0.02932,
+    "hands washed before cutting": 0.06755
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.04,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.66336,
+      0.0,
+      0.93559,
+      0.7141
+     ],
+     "presence": 0.03816,
+     "confidence": 0.53092
+    }
+   }
+  },
+  {
+   "t": 14.5,
+   "p": {
+    "cutting vegetables": 0.03309,
+    "holding a knife": 0.0601,
+    "fridge closed within 30 s": 0.02932,
+    "hands washed before cutting": 0.08511
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 147.03,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.25382,
+      0.21391,
+      0.55279,
+      0.95125
+     ],
+     "presence": 0.02519,
+     "confidence": 0.44791
+    }
+   }
+  },
+  {
+   "t": 15.0,
+   "p": {
+    "cutting vegetables": 0.02932,
+    "holding a knife": 0.0601,
+    "fridge closed within 30 s": 0.02033,
+    "hands washed before cutting": 0.06755
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.25,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.57949,
+      0.2573,
+      0.79744,
+      0.8498
+     ],
+     "presence": 0.02917,
+     "confidence": 0.39273
+    }
+   }
+  },
+  {
+   "t": 15.5,
+   "p": {
+    "cutting vegetables": 0.03309,
+    "holding a knife": 0.05341,
+    "fridge closed within 30 s": 0.02596,
+    "hands washed before cutting": 0.06755
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.09,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.43413,
+      0.14499,
+      0.91525,
+      0.92187
+     ],
+     "presence": 0.01324,
+     "confidence": 0.30772
+    }
+   }
+  },
+  {
+   "t": 16.0,
+   "p": {
+    "cutting vegetables": 0.04209,
+    "holding a knife": 0.03733,
+    "fridge closed within 30 s": 0.02033,
+    "hands washed before cutting": 0.07586
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.04,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.50929,
+      0.0081,
+      0.81453,
+      0.78015
+     ],
+     "presence": 0.00701,
+     "confidence": 0.49356
+    }
+   }
+  },
+  {
+   "t": 16.5,
+   "p": {
+    "cutting vegetables": 0.03733,
+    "holding a knife": 0.03733,
+    "fridge closed within 30 s": 0.02931,
+    "hands washed before cutting": 0.07586
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 143.92,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.57225,
+      0.06223,
+      0.81401,
+      0.77627
+     ],
+     "presence": 0.00622,
+     "confidence": 0.45576
+    }
+   }
+  },
+  {
+   "t": 17.0,
+   "p": {
+    "cutting vegetables": 0.03309,
+    "holding a knife": 0.06009,
+    "fridge closed within 30 s": 0.02931,
+    "hands washed before cutting": 0.1067
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 143.98,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.58411,
+      0.0,
+      0.83806,
+      0.77095
+     ],
+     "presence": 0.01904,
+     "confidence": 0.4382
+    }
+   }
+  },
+  {
+   "t": 17.5333,
+   "p": {
+    "cutting vegetables": 0.04743,
+    "holding a knife": 0.0601,
+    "fridge closed within 30 s": 0.03733,
+    "hands washed before cutting": 0.08511
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 143.64,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.33753,
+      0.0,
+      0.64218,
+      0.70807
+     ],
+     "presence": 0.01103,
+     "confidence": 0.56031
+    }
+   }
+  },
+  {
+   "t": 18.0333,
+   "p": {
+    "cutting vegetables": 0.07587,
+    "holding a knife": 0.08511,
+    "fridge closed within 30 s": 0.05341,
+    "hands washed before cutting": 0.13298
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 143.74,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.25981,
+      0.0,
+      0.58472,
+      0.72252
+     ],
+     "presence": 0.01997,
+     "confidence": 0.51925
+    }
+   }
+  },
+  {
+   "t": 18.5333,
+   "p": {
+    "cutting vegetables": 0.11922,
+    "holding a knife": 0.14807,
+    "fridge closed within 30 s": 0.06009,
+    "hands washed before cutting": 0.22272
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.1,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.15936,
+      0.15374,
+      0.57323,
+      0.98603
+     ],
+     "presence": 0.11015,
+     "confidence": 0.61559
+    }
+   }
+  },
+  {
+   "t": 19.0333,
+   "p": {
+    "cutting vegetables": 0.10671,
+    "holding a knife": 0.13299,
+    "fridge closed within 30 s": 0.06755,
+    "hands washed before cutting": 0.20183
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 143.76,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.34321,
+      0.04041,
+      0.61033,
+      0.79122
+     ],
+     "presence": 0.06369,
+     "confidence": 0.56979
+    }
+   }
+  },
+  {
+   "t": 19.5333,
+   "p": {
+    "cutting vegetables": 0.18245,
+    "holding a knife": 0.14807,
+    "fridge closed within 30 s": 0.09536,
+    "hands washed before cutting": 0.29424
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": false,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 143.89,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.07083,
+      0.15304,
+      0.37313,
+      0.89704
+     ],
+     "presence": 0.06129,
+     "confidence": 0.42667
+    }
+   }
+  },
+  {
+   "t": 20.0333,
+   "p": {
+    "cutting vegetables": 0.7982,
+    "holding a knife": 0.83549,
+    "fridge closed within 30 s": 0.1067,
+    "hands washed before cutting": 0.62247
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.69,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.0199,
+      0.21122,
+      0.40929,
+      0.99929
+     ],
+     "presence": 0.90482,
+     "confidence": 0.62055
+    }
+   }
+  },
+  {
+   "t": 20.5333,
+   "p": {
+    "cutting vegetables": 0.81758,
+    "holding a knife": 0.81758,
+    "fridge closed within 30 s": 0.08511,
+    "hands washed before cutting": 0.56219
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [
+    "cutting vegetables",
+    "holding a knife",
+    "hands washed before cutting"
+   ],
+   "ms": 144.32,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.0,
+      0.18618,
+      0.36992,
+      0.97613
+     ],
+     "presence": 0.93216,
+     "confidence": 0.51235
+    }
+   }
+  },
+  {
+   "t": 21.0333,
+   "p": {
+    "cutting vegetables": 0.83549,
+    "holding a knife": 0.7982,
+    "fridge closed within 30 s": 0.1067,
+    "hands washed before cutting": 0.53123
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 143.92,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.11857,
+      0.00651,
+      0.52918,
+      0.80018
+     ],
+     "presence": 0.92434,
+     "confidence": 0.67124
+    }
+   }
+  },
+  {
+   "t": 21.5333,
+   "p": {
+    "cutting vegetables": 0.83549,
+    "holding a knife": 0.81758,
+    "fridge closed within 30 s": 0.13297,
+    "hands washed before cutting": 0.50002
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.0,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.0,
+      0.27147,
+      0.36386,
+      1.0
+     ],
+     "presence": 0.90398,
+     "confidence": 0.63404
+    }
+   }
+  },
+  {
+   "t": 22.0333,
+   "p": {
+    "cutting vegetables": 0.85196,
+    "holding a knife": 0.83549,
+    "fridge closed within 30 s": 0.11921,
+    "hands washed before cutting": 0.50002
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.21,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.02289,
+      0.25192,
+      0.41342,
+      0.95339
+     ],
+     "presence": 0.933,
+     "confidence": 0.56928
+    }
+   }
+  },
+  {
+   "t": 22.5333,
+   "p": {
+    "cutting vegetables": 0.86704,
+    "holding a knife": 0.81758,
+    "fridge closed within 30 s": 0.11921,
+    "hands washed before cutting": 0.50002
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 143.91,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.15916,
+      0.08614,
+      0.51923,
+      0.88134
+     ],
+     "presence": 0.93918,
+     "confidence": 0.71508
+    }
+   }
+  },
+  {
+   "t": 23.0333,
+   "p": {
+    "cutting vegetables": 0.85196,
+    "holding a knife": 0.83549,
+    "fridge closed within 30 s": 0.08511,
+    "hands washed before cutting": 0.46881
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 143.74,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.31653,
+      0.02121,
+      0.6254,
+      0.85048
+     ],
+     "presence": 0.93498,
+     "confidence": 0.57738
+    }
+   }
+  },
+  {
+   "t": 23.5333,
+   "p": {
+    "cutting vegetables": 0.85196,
+    "holding a knife": 0.83549,
+    "fridge closed within 30 s": 0.09536,
+    "hands washed before cutting": 0.46881
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.25,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.04772,
+      0.16012,
+      0.41131,
+      0.91085
+     ],
+     "presence": 0.92631,
+     "confidence": 0.72808
+    }
+   }
+  },
+  {
+   "t": 24.0333,
+   "p": {
+    "cutting vegetables": 0.85196,
+    "holding a knife": 0.83549,
+    "fridge closed within 30 s": 0.08511,
+    "hands washed before cutting": 0.50002
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 145.06,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.30908,
+      0.12995,
+      0.62734,
+      0.88067
+     ],
+     "presence": 0.95056,
+     "confidence": 0.53333
+    }
+   }
+  },
+  {
+   "t": 24.5333,
+   "p": {
+    "cutting vegetables": 0.8808,
+    "holding a knife": 0.85196,
+    "fridge closed within 30 s": 0.11921,
+    "hands washed before cutting": 0.50002
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.13,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.14519,
+      0.01486,
+      0.42818,
+      0.78583
+     ],
+     "presence": 0.93279,
+     "confidence": 0.58775
+    }
+   }
+  },
+  {
+   "t": 25.0333,
+   "p": {
+    "cutting vegetables": 0.8808,
+    "holding a knife": 0.85196,
+    "fridge closed within 30 s": 0.1067,
+    "hands washed before cutting": 0.53123
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 143.97,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.11314,
+      0.26358,
+      0.47835,
+      0.93491
+     ],
+     "presence": 0.94006,
+     "confidence": 0.65355
+    }
+   }
+  },
+  {
+   "t": 25.5333,
+   "p": {
+    "cutting vegetables": 0.86704,
+    "holding a knife": 0.85196,
+    "fridge closed within 30 s": 0.11921,
+    "hands washed before cutting": 0.56219
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [
+    "cutting vegetables",
+    "holding a knife",
+    "hands washed before cutting"
+   ],
+   "ms": 144.53,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.07874,
+      0.38247,
+      0.42819,
+      0.95262
+     ],
+     "presence": 0.93453,
+     "confidence": 0.67593
+    }
+   }
+  },
+  {
+   "t": 26.0667,
+   "p": {
+    "cutting vegetables": 0.8808,
+    "holding a knife": 0.83549,
+    "fridge closed within 30 s": 0.11921,
+    "hands washed before cutting": 0.53122
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.35,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.18911,
+      0.02742,
+      0.52776,
+      0.82104
+     ],
+     "presence": 0.93161,
+     "confidence": 0.66956
+    }
+   }
+  },
+  {
+   "t": 26.5667,
+   "p": {
+    "cutting vegetables": 0.8808,
+    "holding a knife": 0.83549,
+    "fridge closed within 30 s": 0.1067,
+    "hands washed before cutting": 0.53123
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.18,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.176,
+      0.08632,
+      0.45318,
+      0.71768
+     ],
+     "presence": 0.91686,
+     "confidence": 0.71623
+    }
+   }
+  },
+  {
+   "t": 27.0667,
+   "p": {
+    "cutting vegetables": 0.8808,
+    "holding a knife": 0.81758,
+    "fridge closed within 30 s": 0.1067,
+    "hands washed before cutting": 0.56219
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.06,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.21615,
+      0.16264,
+      0.61504,
+      0.9343
+     ],
+     "presence": 0.92335,
+     "confidence": 0.55587
+    }
+   }
+  },
+  {
+   "t": 27.5667,
+   "p": {
+    "cutting vegetables": 0.89331,
+    "holding a knife": 0.83549,
+    "fridge closed within 30 s": 0.1067,
+    "hands washed before cutting": 0.56219
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.29,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.71077,
+      0.0,
+      1.0,
+      0.33882
+     ],
+     "presence": 0.90706,
+     "confidence": 0.48761
+    }
+   }
+  },
+  {
+   "t": 28.0667,
+   "p": {
+    "cutting vegetables": 0.89331,
+    "holding a knife": 0.83549,
+    "fridge closed within 30 s": 0.1067,
+    "hands washed before cutting": 0.50002
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.3,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.10018,
+      0.31549,
+      0.4407,
+      0.95844
+     ],
+     "presence": 0.89975,
+     "confidence": 0.57964
+    }
+   }
+  },
+  {
+   "t": 28.5667,
+   "p": {
+    "cutting vegetables": 0.8808,
+    "holding a knife": 0.81758,
+    "fridge closed within 30 s": 0.09536,
+    "hands washed before cutting": 0.46881
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.32,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.21954,
+      0.13922,
+      0.58656,
+      0.91346
+     ],
+     "presence": 0.89142,
+     "confidence": 0.61497
+    }
+   }
+  },
+  {
+   "t": 29.0667,
+   "p": {
+    "cutting vegetables": 0.8808,
+    "holding a knife": 0.7982,
+    "fridge closed within 30 s": 0.08511,
+    "hands washed before cutting": 0.50002
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.17,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.1209,
+      0.16859,
+      0.50893,
+      0.92668
+     ],
+     "presence": 0.86822,
+     "confidence": 0.43545
+    }
+   }
+  },
+  {
+   "t": 29.5667,
+   "p": {
+    "cutting vegetables": 0.77731,
+    "holding a knife": 0.62249,
+    "fridge closed within 30 s": 0.07586,
+    "hands washed before cutting": 0.50002
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.06,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.08287,
+      0.10418,
+      0.31172,
+      0.80321
+     ],
+     "presence": 0.80742,
+     "confidence": 0.62614
+    }
+   }
+  },
+  {
+   "t": 30.0667,
+   "p": {
+    "cutting vegetables": 0.7058,
+    "holding a knife": 0.59269,
+    "fridge closed within 30 s": 0.22272,
+    "hands washed before cutting": 0.46881
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 143.78,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.08825,
+      0.09735,
+      0.34388,
+      0.82159
+     ],
+     "presence": 0.72941,
+     "confidence": 0.70389
+    }
+   }
+  },
+  {
+   "t": 30.5667,
+   "p": {
+    "cutting vegetables": 0.75493,
+    "holding a knife": 0.73108,
+    "fridge closed within 30 s": 0.20183,
+    "hands washed before cutting": 0.46881
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [
+    "cutting vegetables",
+    "holding a knife"
+   ],
+   "ms": 144.19,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.0099,
+      0.15371,
+      0.3653,
+      0.90872
+     ],
+     "presence": 0.85497,
+     "confidence": 0.54006
+    }
+   }
+  },
+  {
+   "t": 31.0667,
+   "p": {
+    "cutting vegetables": 0.77731,
+    "holding a knife": 0.75493,
+    "fridge closed within 30 s": 0.18244,
+    "hands washed before cutting": 0.50002
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.3,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.06141,
+      0.24776,
+      0.42922,
+      1.0
+     ],
+     "presence": 0.91092,
+     "confidence": 0.66558
+    }
+   }
+  },
+  {
+   "t": 31.5667,
+   "p": {
+    "cutting vegetables": 0.7982,
+    "holding a knife": 0.77731,
+    "fridge closed within 30 s": 0.22271,
+    "hands washed before cutting": 0.53123
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [
+    "hands washed before cutting"
+   ],
+   "ms": 144.18,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.10413,
+      0.18365,
+      0.39965,
+      0.94667
+     ],
+     "presence": 0.90967,
+     "confidence": 0.72734
+    }
+   }
+  },
+  {
+   "t": 32.0667,
+   "p": {
+    "cutting vegetables": 0.7982,
+    "holding a knife": 0.75493,
+    "fridge closed within 30 s": 0.18244,
+    "hands washed before cutting": 0.53123
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.35,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.05247,
+      0.0091,
+      0.31662,
+      0.72609
+     ],
+     "presence": 0.90485,
+     "confidence": 0.60931
+    }
+   }
+  },
+  {
+   "t": 32.5667,
+   "p": {
+    "cutting vegetables": 0.7982,
+    "holding a knife": 0.75493,
+    "fridge closed within 30 s": 0.18244,
+    "hands washed before cutting": 0.50002
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 144.19,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.06108,
+      0.03694,
+      0.35856,
+      0.77837
+     ],
+     "presence": 0.91209,
+     "confidence": 0.74005
+    }
+   }
+  },
+  {
+   "t": 33.0667,
+   "p": {
+    "cutting vegetables": 0.70581,
+    "holding a knife": 0.67921,
+    "fridge closed within 30 s": 0.14806,
+    "hands washed before cutting": 0.50002
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": true
+   },
+   "alerts": [],
+   "ms": 143.99,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.06732,
+      0.30883,
+      0.39866,
+      1.0
+     ],
+     "presence": 0.8536,
+     "confidence": 0.51682
+    }
+   }
+  },
+  {
+   "t": 33.5667,
+   "p": {
+    "cutting vegetables": 0.6792,
+    "holding a knife": 0.62249,
+    "fridge closed within 30 s": 0.20183,
+    "hands washed before cutting": 0.46881
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 143.88,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.00168,
+      0.0,
+      0.36715,
+      0.72009
+     ],
+     "presence": 0.81166,
+     "confidence": 0.50697
+    }
+   }
+  },
+  {
+   "t": 34.0667,
+   "p": {
+    "cutting vegetables": 0.43787,
+    "holding a knife": 0.53126,
+    "fridge closed within 30 s": 0.05341,
+    "hands washed before cutting": 0.37756
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 143.95,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.01518,
+      0.12105,
+      0.32807,
+      0.90104
+     ],
+     "presence": 0.75549,
+     "confidence": 0.5565
+    }
+   }
+  },
+  {
+   "t": 34.6,
+   "p": {
+    "cutting vegetables": 0.43787,
+    "holding a knife": 0.7982,
+    "fridge closed within 30 s": 0.07586,
+    "hands washed before cutting": 0.37756
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.01,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.01928,
+      0.12024,
+      0.51115,
+      0.96242
+     ],
+     "presence": 0.97879,
+     "confidence": 0.64419
+    }
+   }
+  },
+  {
+   "t": 35.1,
+   "p": {
+    "cutting vegetables": 0.40738,
+    "holding a knife": 0.7982,
+    "fridge closed within 30 s": 0.07586,
+    "hands washed before cutting": 0.29424
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.2,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.16045,
+      0.0,
+      0.46151,
+      0.78291
+     ],
+     "presence": 0.97555,
+     "confidence": 0.73261
+    }
+   }
+  },
+  {
+   "t": 35.6,
+   "p": {
+    "cutting vegetables": 0.40738,
+    "holding a knife": 0.77731,
+    "fridge closed within 30 s": 0.06755,
+    "hands washed before cutting": 0.29423
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [
+    "holding a knife"
+   ],
+   "ms": 144.17,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.14243,
+      0.0,
+      0.46346,
+      0.83129
+     ],
+     "presence": 0.97303,
+     "confidence": 0.72297
+    }
+   }
+  },
+  {
+   "t": 36.1,
+   "p": {
+    "cutting vegetables": 0.46884,
+    "holding a knife": 0.7982,
+    "fridge closed within 30 s": 0.05341,
+    "hands washed before cutting": 0.32084
+   },
+   "on": {
+    "cutting vegetables": false,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.54,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.03656,
+      0.15345,
+      0.49069,
+      0.98243
+     ],
+     "presence": 0.97002,
+     "confidence": 0.61877
+    }
+   }
+  },
+  {
+   "t": 36.5,
+   "p": {
+    "cutting vegetables": 0.53126,
+    "holding a knife": 0.81759,
+    "fridge closed within 30 s": 0.05341,
+    "hands washed before cutting": 0.37756
+   },
+   "on": {
+    "cutting vegetables": true,
+    "holding a knife": true,
+    "fridge closed within 30 s": false,
+    "hands washed before cutting": false
+   },
+   "alerts": [],
+   "ms": 144.38,
+   "boxes": {
+    "holding a knife": {
+     "xyxy": [
+      0.1682,
+      0.07931,
+      0.57678,
+      0.82879
+     ],
+     "presence": 0.96422,
+     "confidence": 0.60731
+    }
+   }
+  }
+ ]
+}
